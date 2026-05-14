@@ -21,6 +21,27 @@ app.use(cors({
     methods:["GET","POST","DELETE","PUT","PATCH"],
     credentials: true
 }))
+import mongoose from "mongoose";
+
+//connect to db (lazy connection - connects on first request if not already connected)
+async function connectDB() {
+    if (mongoose.connection.readyState === 1) return;
+    try {
+        await mongoose.connect(process.env.DB_URL, {
+            serverSelectionTimeoutMS: 5000 // fail fast
+        });
+        console.log("connected to db successfully");
+    } catch(err) {
+        console.log("err in connection to db:" , err);
+    }
+}
+
+// Middleware to ensure DB connection before handling requests
+app.use(async (req, res, next) => {
+    await connectDB();
+    next();
+});
+
 //forward req to route handlers
 app.use("/user-api",UserApp)
 app.use("/author-api",authorRoute)
@@ -30,25 +51,6 @@ app.use("/admin-api",adminRoute)
 // Root route to check if API is running
 app.get("/", (req, res) => {
     res.send({ message: "Blog API is running successfully!" });
-});
-
-//connect to db (lazy connection - connects on first request if not already connected)
-let isConnected = false;
-async function connectDB() {
-    if (isConnected) return;
-    try {
-        await connect(process.env.DB_URL);
-        isConnected = true;
-        console.log("connected to db successfully")
-    } catch(err) {
-        console.log("err in connection to db:" , err)
-    }
-}
-
-// Middleware to ensure DB connection before handling requests
-app.use(async (req, res, next) => {
-    await connectDB();
-    next();
 });
 
 //add error handling middleware
