@@ -2,7 +2,7 @@ services:
   - type: web
     name: blog-backend
     env: node
-    rootDir: backend
+    rootDir: SUNTEK-assignments/week-9-10/backend
     buildCommand: npm install
     startCommand: npm start
     envVars:
@@ -29,7 +29,7 @@ services:
   - type: web
     name: blog-frontend
     env: static
-    rootDir: frontend
+    rootDir: SUNTEK-assignments/week-9-10/frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
