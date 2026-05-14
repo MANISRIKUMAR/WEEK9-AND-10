@@ -27,6 +27,11 @@ app.use("/author-api",authorRoute)
 app.use("/common-api",commonRouter)
 app.use("/admin-api",adminRoute)
 
+// Root route to check if API is running
+app.get("/", (req, res) => {
+    res.send({ message: "Blog API is running successfully!" });
+});
+
 //connect to db (lazy connection - connects on first request if not already connected)
 let isConnected = false;
 async function connectDB() {
