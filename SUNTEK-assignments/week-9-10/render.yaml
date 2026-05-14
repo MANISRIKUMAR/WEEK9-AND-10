@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: blog-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_URL
+        fromService:
+          type: web
+          name: blog-frontend
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: DB_URL
+        sync: false # Set your MongoDB Atlas connection string in the Render Dashboard
+      - key: JWT_SECRET
+        sync: false # Set a strong secret key in the Render Dashboard
+      - key: CLOUD_NAME
+        sync: false # Set your Cloudinary cloud name in the Render Dashboard
+      - key: API_KEY
+        sync: false # Set your Cloudinary API key in the Render Dashboard
+      - key: API_SECRET
+        sync: false # Set your Cloudinary API secret in the Render Dashboard
+
+  - type: web
+    name: blog-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: blog-backend
+          envVarKey: RENDER_EXTERNAL_URL

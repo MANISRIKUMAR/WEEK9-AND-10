@@ -7,7 +7,7 @@ function UserList() {
     useEffect(()=>{
         async function getUsers(){
             try{
-            let res=await fetch("http://localhost:5000/user-api/users", {
+            let res=await fetch(import.meta.env.VITE_API_URL + "/user-api/users", {
                 method:"GET"
             })
             if (res.status===200){

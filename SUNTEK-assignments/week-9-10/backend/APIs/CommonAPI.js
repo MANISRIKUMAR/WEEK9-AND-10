@@ -1,10 +1,17 @@
 import exp from "express";
 import { authenticate } from "../services/authService.js";
-import { UserTypeModel } from "../models/UserModel.js";
+import { UserTypeModel } from "../models/UserTypeModel.js";
 import { ArticleModel } from "../models/ArticleModel.js";
 import bcrypt from "bcryptjs";
 import { verifyToken } from "../middlewares/verifyToken.js";
 export const commonRouter = exp.Router();
+
+const isProduction = process.env.NODE_ENV === "production";
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+};
 
 //login
 commonRouter.post("/login", async (req, res) => {
@@ -12,12 +19,8 @@ commonRouter.post("/login", async (req, res) => {
   let userCred = req.body;
   //call authenticate service
   let { token, user } = await authenticate(userCred);
-  //save tokan as httpOnly cookie
-  res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: false,
-  });
+  //save token as httpOnly cookie
+  res.cookie("token", token, cookieOptions);
   //send res
   res.status(200).json({ message: "login success", payload: user });
 });
@@ -25,11 +28,7 @@ commonRouter.post("/login", async (req, res) => {
 //logout for User, Author and Admin
 commonRouter.get("/logout", (req, res) => {
   // Clear the cookie named 'token'
-  res.clearCookie("token", {
-    httpOnly: true, // Must match original  settings
-    secure: false, // Must match original  settings
-    sameSite: "lax", // Must match original  settings
-  });
+  res.clearCookie("token", cookieOptions);
 
   res.status(200).json({ message: "Logged out successfully" });
 });

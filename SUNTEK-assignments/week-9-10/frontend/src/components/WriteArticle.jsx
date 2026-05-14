@@ -31,7 +31,7 @@ function WriteArticle() {
 
     try {
       await axios.post(
-        "http://localhost:4000/author-api/articles",
+        import.meta.env.VITE_API_URL + "/author-api/articles",
         articleObj,
         { withCredentials: true }
       );
