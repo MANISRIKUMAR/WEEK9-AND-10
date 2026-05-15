@@ -32,15 +32,14 @@ function Register() {
     const formData = new FormData();
     //get user object
     let { role, profileImageUrl, ...userObj } = newUser;
-    console.log("role", role);
-    console.log("profileImageUrl", profileImageUrl);
     //add all fields except profilePic to FormData object
     Object.keys(userObj).forEach((key) => {
       formData.append(key, userObj[key]);
     });
-    // add profilePic to Formdata object
-    formData.append("profileImageUrl", profileImageUrl[0]);
-    //add image to formData objecte
+    // add profilePic to Formdata object only if it exists
+    if (profileImageUrl && profileImageUrl.length > 0) {
+      formData.append("profileImageUrl", profileImageUrl[0]);
+    }
     try {
       if (role === "user") {
         //make API req to user-api

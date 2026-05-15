@@ -9,17 +9,31 @@ export const UserApp=exp.Router();
 
 import { register } from '../services/authService.js';
 
+import { upload } from '../config/multer.js';
+import cloudinary from '../config/cloudinary.js';
+import { uploadToCloudinary } from '../config/cloudinaryUpload.js';
+
 //create user
-UserApp.post("/users", async (req, res, next) => {
+UserApp.post("/users", upload.single("profileImageUrl"), async (req, res, next) => {
+    let cloudinaryResult;
     try {
         let userObj = req.body;
+        
+        if (req.file) {
+            cloudinaryResult = await uploadToCloudinary(req.file.buffer);
+        }
+
         // call existing register()
         const newUserObj = await register({
             ...userObj,
-            role: "USER"
+            role: "USER",
+            profileImageUrl: cloudinaryResult?.secure_url,
         });
         res.status(201).json({ message: "user created successfully", payload: newUserObj });
     } catch (err) {
+        if (cloudinaryResult?.public_id) {
+            await cloudinary.uploader.destroy(cloudinaryResult.public_id);
+        }
         next(err); // pass to error handler middleware
     }
 })
