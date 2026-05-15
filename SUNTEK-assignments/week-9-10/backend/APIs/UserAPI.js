@@ -7,20 +7,20 @@ export const UserApp=exp.Router();
 
 //user api routes
 
+import { register } from '../services/authService.js';
+
 //create user
-UserApp.post("/users",async(req,res)=>{
-    try{
-        //get user data from req body
-        const newUser=req.body;
-        //create user doc
-        const newUserDocument=new UserModel(newUser);
-        //save new user
-        let user=await newUserDocument.save();
-        //send response
-        res.status(201).json({message:"user created successfully",payload:user})
-    }
-    catch(err){
-        res.status(500).json({message:"error in creating user",description:err.message})
+UserApp.post("/users", async (req, res, next) => {
+    try {
+        let userObj = req.body;
+        // call existing register()
+        const newUserObj = await register({
+            ...userObj,
+            role: "USER"
+        });
+        res.status(201).json({ message: "user created successfully", payload: newUserObj });
+    } catch (err) {
+        next(err); // pass to error handler middleware
     }
 })
 //read all users

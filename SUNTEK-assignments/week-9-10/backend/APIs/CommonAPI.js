@@ -14,15 +14,19 @@ const cookieOptions = {
 };
 
 //login
-commonRouter.post("/login", async (req, res) => {
-  //get user cred object
-  let userCred = req.body;
-  //call authenticate service
-  let { token, user } = await authenticate(userCred);
-  //save token as httpOnly cookie
-  res.cookie("token", token, cookieOptions);
-  //send res
-  res.status(200).json({ message: "login success", payload: user });
+commonRouter.post("/login", async (req, res, next) => {
+  try {
+    //get user cred object
+    let userCred = req.body;
+    //call authenticate service
+    let { token, user } = await authenticate(userCred);
+    //save token as httpOnly cookie
+    res.cookie("token", token, cookieOptions);
+    //send res
+    res.status(200).json({ message: "login success", payload: user });
+  } catch (err) {
+    next(err);
+  }
 });
 
 //logout for User, Author and Admin
